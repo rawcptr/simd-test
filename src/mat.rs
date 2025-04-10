@@ -69,6 +69,10 @@ impl<T: MatrixElement> Tensor<T> {
 
         let ptr = unsafe { std::alloc::alloc(layout) };
         let ptr = NonNull::new(ptr as *mut _).expect("alloc'd ptr was none");
+        // we don't want any uninit'd reads
+        unsafe {
+            std::ptr::write_bytes(ptr.as_ptr(), 0, padded_nelement);
+        }
 
         Self {
             ptr,
